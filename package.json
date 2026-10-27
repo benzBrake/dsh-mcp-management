@@ -1,0 +1,48 @@
+{
+  "name": "dsh-mcp-management",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP 管理（全局 / 项目）：直接编辑 mcp.yml，项目级 MCP 挂在会话自己的 Agent 作用域里，改完热生效",
+  "type": "module",
+  "main": "src/host/index.js",
+  "exports": {
+    ".": {
+      "default": "./src/host/index.js"
+    },
+    "./client": {
+      "default": "./src/client/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-locale"
+      ],
+      "platform": "web"
+    }
+  },
+  "files": [
+    "src",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.mjs\"",
+    "test:patch": "pwsh -NoProfile -File scripts/patch-lines.test.ps1",
+    "test:manifest": "pwsh -NoProfile -File scripts/profile-manifest.test.ps1",
+    "check": "node scripts/check.mjs",
+    "install-plugin": "pwsh -NoProfile -File scripts/install.ps1",
+    "uninstall-plugin": "pwsh -NoProfile -File scripts/install.ps1 -Uninstall"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,10 @@
+# 项目级 MCP —— 只在这个工作目录的会话里生效（dsh-mcp-management 管理）
+#
+# name              → 工具前缀 mcp__<name>__*
+# transport         → stdio | streamable-http
+# command/args/cwd  → stdio 启动命令
+# url/headers       → streamable-http 地址
+# env               → 子进程环境变量
+# toolCallTimeoutMs → 单次工具调用超时
+# enabled: false    → 保留配置但不连接
+servers: []

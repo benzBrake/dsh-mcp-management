@@ -1,0 +1,54 @@
+# ── 依赖 ────────────────────────────────────────────────
+# 插件本体不装依赖，js-yaml / MCP SDK 从 profile 解析
+node_modules/
+.pnpm-store/
+package-lock.json.bak
+
+# ── 构建 / 打包产物 ─────────────────────────────────────
+dist/
+build/
+out/
+*.tgz
+*.zip
+
+# ── 测试与覆盖率 ────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+
+# ── 运行时产物与备份 ────────────────────────────────────
+*.log
+logs/
+.tmp/
+tmp/
+*.bak
+*.bak-*
+*.orig
+*.rej
+*.swp
+*~
+
+# 本地调试快照（loader 行 debugFile 指到这里时）
+*.debug.json
+mcp-debug.json
+
+# ── 本地配置 / 密钥 ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.local.yml
+*.local.yaml
+*.pem
+*.key
+secrets/
+
+# ── 编辑器 / IDE ───────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-workspace
+
+# ── 操作系统 ───────────────────────────────────────────
+.DS_Store
+._*
+Thumbs.db
+desktop.ini

@@ -1,0 +1,674 @@
+{
+  "generatedFrom": "dsh-mcp-presets 2.0.0 · lib/index.js（单文件实现）",
+  "generatedBy": "scripts/snapshot-parity.mjs",
+  "shape": {
+    "name": "mcp-presets",
+    "inject": [
+      "connection",
+      "loader"
+    ],
+    "internals": [
+      "collectPatchMcpRows",
+      "createRuntime",
+      "dispatch",
+      "normalizeServerRow",
+      "probeServer",
+      "readServersFile",
+      "removePatchMcpRows",
+      "resolvePaths",
+      "toEntryRow",
+      "writeServersFile"
+    ]
+  },
+  "resolvePaths": [
+    {
+      "config": {},
+      "expected": {
+        "profileDir": "<HOME>\\.dsh\\profiles\\desktop",
+        "globalFile": "<HOME>\\.dsh\\profiles\\desktop\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "<HOME>\\.dsh\\profiles\\desktop\\cordis.patch.yml",
+        "debugFile": ""
+      }
+    },
+    {
+      "config": {
+        "patchFile": "D:\\profiles\\alt\\cordis.patch.yml"
+      },
+      "expected": {
+        "profileDir": "D:\\profiles\\alt",
+        "globalFile": "D:\\profiles\\alt\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "D:\\profiles\\alt\\cordis.patch.yml",
+        "debugFile": ""
+      }
+    },
+    {
+      "config": {
+        "profileDir": "D:\\profiles\\p1"
+      },
+      "expected": {
+        "profileDir": "D:\\profiles\\p1",
+        "globalFile": "D:\\profiles\\p1\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "D:\\profiles\\p1\\cordis.patch.yml",
+        "debugFile": ""
+      }
+    },
+    {
+      "config": {
+        "profileDir": "  D:\\profiles\\p2  ",
+        "globalFile": "D:\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "D:\\p.yml"
+      },
+      "expected": {
+        "profileDir": "D:\\profiles\\p2",
+        "globalFile": "D:\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "D:\\p.yml",
+        "debugFile": ""
+      }
+    },
+    {
+      "config": {
+        "globalFile": "  "
+      },
+      "expected": {
+        "profileDir": "<HOME>\\.dsh\\profiles\\desktop",
+        "globalFile": "<HOME>\\.dsh\\profiles\\desktop\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "<HOME>\\.dsh\\profiles\\desktop\\cordis.patch.yml",
+        "debugFile": ""
+      }
+    },
+    {
+      "config": {
+        "projectFile": "config\\mcp.yml",
+        "debugFile": "D:\\debug\\mcp.json"
+      },
+      "expected": {
+        "profileDir": "<HOME>\\.dsh\\profiles\\desktop",
+        "globalFile": "<HOME>\\.dsh\\profiles\\desktop\\mcp.yml",
+        "projectFile": "config\\mcp.yml",
+        "patchFile": "<HOME>\\.dsh\\profiles\\desktop\\cordis.patch.yml",
+        "debugFile": "D:\\debug\\mcp.json"
+      }
+    },
+    {
+      "config": {
+        "profileDir": "E:\\p3",
+        "debugFile": "   "
+      },
+      "expected": {
+        "profileDir": "E:\\p3",
+        "globalFile": "E:\\p3\\mcp.yml",
+        "projectFile": ".dsh\\mcp.yml",
+        "patchFile": "E:\\p3\\cordis.patch.yml",
+        "debugFile": ""
+      }
+    }
+  ],
+  "normalizeServerRow": [
+    {
+      "row": {
+        "name": "ida",
+        "transport": "stdio",
+        "command": "D:\\tools\\ida\\idalib-mcp.exe",
+        "args": [
+          "--stdio"
+        ],
+        "cwd": "D:\\work\\ida-env"
+      },
+      "expected": {
+        "server": {
+          "name": "ida",
+          "transport": "stdio",
+          "command": "D:\\tools\\ida\\idalib-mcp.exe",
+          "args": [
+            "--stdio"
+          ],
+          "cwd": "D:\\work\\ida-env"
+        }
+      }
+    },
+    {
+      "row": {
+        "name": "ida",
+        "transport": "stdio",
+        "command": "  D:\\tools\\ida\\idalib-mcp.exe  ",
+        "args": [
+          1,
+          2
+        ],
+        "env": {
+          "IDADIR": 1,
+          "X": "y"
+        },
+        "toolCallTimeoutMs": "300000"
+      },
+      "expected": {
+        "server": {
+          "name": "ida",
+          "transport": "stdio",
+          "command": "D:\\tools\\ida\\idalib-mcp.exe",
+          "args": [
+            "1",
+            "2"
+          ],
+          "env": {
+            "IDADIR": "1",
+            "X": "y"
+          },
+          "toolCallTimeoutMs": 300000
+        }
+      }
+    },
+    {
+      "row": {
+        "name": "web",
+        "url": "https://example.test/mcp",
+        "headers": {
+          "Authorization": "Bearer T"
+        }
+      },
+      "expected": {
+        "server": {
+          "name": "web",
+          "transport": "streamable-http",
+          "url": "https://example.test/mcp",
+          "headers": {
+            "Authorization": "Bearer T"
+          }
+        }
+      }
+    },
+    {
+      "row": {
+        "name": "web",
+        "transport": "streamable-http",
+        "url": "https://example.test/mcp",
+        "env": {
+          "A": "b"
+        }
+      },
+      "expected": {
+        "server": {
+          "name": "web",
+          "transport": "streamable-http",
+          "url": "https://example.test/mcp",
+          "env": {
+            "A": "b"
+          }
+        }
+      }
+    },
+    {
+      "row": {
+        "name": "bad name",
+        "command": "x"
+      },
+      "expected": {
+        "error": "缺少合法的 name（服务器名），需要匹配 [A-Za-z0-9_-]{1,32}，例如 \"ida\""
+      }
+    },
+    {
+      "row": {
+        "name": "nocmd",
+        "transport": "stdio"
+      },
+      "expected": {
+        "error": "\"nocmd\" 是 stdio 传输，但缺少 command"
+      }
+    },
+    {
+      "row": {
+        "name": "nourl",
+        "transport": "streamable-http"
+      },
+      "expected": {
+        "error": "\"nourl\" 是 streamable-http 传输，但缺少 http(s) URL"
+      }
+    },
+    {
+      "row": {
+        "id": "mcp-ida",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "serverName": "ida",
+          "transport": "stdio",
+          "command": "x.exe",
+          "args": [
+            "--a"
+          ]
+        }
+      },
+      "expected": {
+        "server": {
+          "name": "ida",
+          "transport": "stdio",
+          "command": "x.exe",
+          "args": [
+            "--a"
+          ]
+        }
+      }
+    },
+    {
+      "row": {
+        "id": "mcp-off",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "disabled": true,
+        "config": {
+          "serverName": "off",
+          "transport": "stdio",
+          "command": "y.exe"
+        }
+      },
+      "expected": {
+        "server": {
+          "name": "off",
+          "transport": "stdio",
+          "enabled": false,
+          "command": "y.exe"
+        }
+      }
+    },
+    {
+      "row": {
+        "name": "off2",
+        "transport": "stdio",
+        "command": "z.exe",
+        "enabled": false
+      },
+      "expected": {
+        "server": {
+          "name": "off2",
+          "transport": "stdio",
+          "enabled": false,
+          "command": "z.exe"
+        }
+      }
+    },
+    {
+      "row": {
+        "name": 42
+      },
+      "expected": {
+        "error": "缺少合法的 name（服务器名），需要匹配 [A-Za-z0-9_-]{1,32}，例如 \"ida\""
+      }
+    },
+    {
+      "row": "not-an-object",
+      "expected": {
+        "error": "不是一个对象"
+      }
+    },
+    {
+      "row": null,
+      "expected": {
+        "error": "不是一个对象"
+      }
+    }
+  ],
+  "toEntryRow": [
+    {
+      "server": {
+        "name": "ida",
+        "transport": "stdio",
+        "command": "x.exe",
+        "args": [
+          "--stdio"
+        ],
+        "cwd": "C:\\w",
+        "env": {
+          "A": "b"
+        },
+        "toolCallTimeoutMs": 300000
+      },
+      "expected": {
+        "id": "mcp-ida",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "serverName": "ida",
+          "transport": "stdio",
+          "command": "x.exe",
+          "args": [
+            "--stdio"
+          ],
+          "cwd": "C:\\w",
+          "env": {
+            "A": "b"
+          },
+          "toolCallTimeoutMs": 300000
+        }
+      }
+    },
+    {
+      "server": {
+        "name": "off",
+        "transport": "stdio",
+        "command": "y.exe",
+        "enabled": false
+      },
+      "expected": {
+        "id": "mcp-off",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "serverName": "off",
+          "transport": "stdio",
+          "command": "y.exe"
+        },
+        "disabled": true
+      }
+    },
+    {
+      "server": {
+        "name": "web",
+        "transport": "streamable-http",
+        "url": "https://e.test/mcp",
+        "headers": {
+          "Authorization": "Bearer T"
+        }
+      },
+      "expected": {
+        "id": "mcp-web",
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "serverName": "web",
+          "transport": "streamable-http",
+          "url": "https://e.test/mcp",
+          "headers": {
+            "Authorization": "Bearer T"
+          }
+        }
+      }
+    }
+  ],
+  "readServersFile": [
+    {
+      "name": "missing.yml",
+      "text": null,
+      "expected": {
+        "file": "missing.yml",
+        "exists": false,
+        "status": "missing",
+        "servers": [],
+        "warnings": []
+      }
+    },
+    {
+      "name": "empty.yml",
+      "text": "   \n\n",
+      "expected": {
+        "file": "empty.yml",
+        "exists": true,
+        "status": "empty",
+        "servers": [],
+        "warnings": []
+      }
+    },
+    {
+      "name": "nulls.yml",
+      "text": "null\n",
+      "expected": {
+        "file": "nulls.yml",
+        "exists": true,
+        "status": "empty",
+        "servers": [],
+        "warnings": []
+      }
+    },
+    {
+      "name": "ok.yml",
+      "text": "servers:\n  - name: ida\n    transport: stdio\n    command: D:\\\\tools\\\\ida\\\\idalib-mcp.exe\n    args: [\"--stdio\"]\n    env: { IDADIR: D:\\\\tools\\\\ida }\n    toolCallTimeoutMs: 300000\n  - name: web\n    url: https://example.test/mcp\n",
+      "expected": {
+        "file": "ok.yml",
+        "exists": true,
+        "status": "ok",
+        "servers": [
+          {
+            "name": "ida",
+            "transport": "stdio",
+            "command": "D:\\\\tools\\\\ida\\\\idalib-mcp.exe",
+            "args": [
+              "--stdio"
+            ],
+            "env": {
+              "IDADIR": "D:\\\\tools\\\\ida"
+            },
+            "toolCallTimeoutMs": 300000
+          },
+          {
+            "name": "web",
+            "transport": "streamable-http",
+            "url": "https://example.test/mcp"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "name": "array.yml",
+      "text": "- name: a\n  command: a.exe\n- name: b\n  url: https://b.test/mcp\n",
+      "expected": {
+        "file": "array.yml",
+        "exists": true,
+        "status": "ok",
+        "servers": [
+          {
+            "name": "a",
+            "transport": "stdio",
+            "command": "a.exe"
+          },
+          {
+            "name": "b",
+            "transport": "streamable-http",
+            "url": "https://b.test/mcp"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "name": "dupe.yml",
+      "text": "servers:\n  - name: same\n    command: a.exe\n  - name: same\n    command: b.exe\n",
+      "expected": {
+        "file": "dupe.yml",
+        "exists": true,
+        "status": "ok",
+        "servers": [
+          {
+            "name": "same",
+            "transport": "stdio",
+            "command": "a.exe"
+          }
+        ],
+        "warnings": [
+          "第 2 条：名称 \"same\" 重复，已忽略"
+        ]
+      }
+    },
+    {
+      "name": "badrow.yml",
+      "text": "servers:\n  - name: \"has space\"\n    command: a.exe\n  - name: ok\n    command: b.exe\n",
+      "expected": {
+        "file": "badrow.yml",
+        "exists": true,
+        "status": "ok",
+        "servers": [
+          {
+            "name": "ok",
+            "transport": "stdio",
+            "command": "b.exe"
+          }
+        ],
+        "warnings": [
+          "第 1 条：缺少合法的 name（服务器名），需要匹配 [A-Za-z0-9_-]{1,32}，例如 \"ida\""
+        ]
+      }
+    },
+    {
+      "name": "nolist.yml",
+      "text": "servers: 42\n",
+      "expected": {
+        "file": "nolist.yml",
+        "exists": true,
+        "status": "invalid",
+        "servers": [],
+        "warnings": [],
+        "error": "`servers:` 必须是一个列表"
+      }
+    },
+    {
+      "name": "scalar.yml",
+      "text": "just-a-string\n",
+      "expected": {
+        "file": "scalar.yml",
+        "exists": true,
+        "status": "invalid",
+        "servers": [],
+        "warnings": [],
+        "error": "顶层需要是一个服务器列表，或包含 `servers:` 列表的对象"
+      }
+    },
+    {
+      "name": "broken.yml",
+      "text": "servers: [\n  - name: x\n",
+      "expected": {
+        "file": "broken.yml",
+        "exists": true,
+        "status": "invalid",
+        "servers": [],
+        "warnings": [],
+        "error": "YAML 解析失败：missed comma between flow collection entries (2:3)\n\n 1 | servers: [\n 2 |   - name: x\n-------^"
+      }
+    }
+  ],
+  "writeServersFile": {
+    "header": "# 备注\n# 第二行\n",
+    "servers": [
+      {
+        "name": "ida",
+        "transport": "stdio",
+        "command": "D:\\tools\\ida\\idalib-mcp.exe",
+        "args": [
+          "--stdio"
+        ],
+        "cwd": "D:\\work\\ida-env",
+        "env": {
+          "IDADIR": "D:\\work\\ida-env\\ida91"
+        },
+        "toolCallTimeoutMs": 300000
+      },
+      {
+        "name": "off",
+        "transport": "stdio",
+        "command": "y.exe",
+        "enabled": false
+      },
+      {
+        "name": "web",
+        "transport": "streamable-http",
+        "url": "https://example.test/mcp",
+        "headers": {
+          "Authorization": "Bearer T"
+        }
+      }
+    ],
+    "pruneTo": 1,
+    "afterFirst": "# 备注\n# 第二行\nservers:\n  - name: ida\n    transport: stdio\n    command: D:\\tools\\ida\\idalib-mcp.exe\n    args:\n      - '--stdio'\n    cwd: D:\\work\\ida-env\n    env:\n      IDADIR: D:\\work\\ida-env\\ida91\n    toolCallTimeoutMs: 300000\n  - name: 'off'\n    transport: stdio\n    enabled: false\n    command: y.exe\n  - name: web\n    transport: streamable-http\n    url: https://example.test/mcp\n    headers:\n      Authorization: Bearer T\n",
+    "afterSecond": "# 备注\n# 第二行\nservers:\n  - name: ida\n    transport: stdio\n    command: D:\\tools\\ida\\idalib-mcp.exe\n    args:\n      - '--stdio'\n    cwd: D:\\work\\ida-env\n    env:\n      IDADIR: D:\\work\\ida-env\\ida91\n    toolCallTimeoutMs: 300000\n",
+    "bak": "# 备注\n# 第二行\nservers:\n  - name: ida\n    transport: stdio\n    command: D:\\tools\\ida\\idalib-mcp.exe\n    args:\n      - '--stdio'\n    cwd: D:\\work\\ida-env\n    env:\n      IDADIR: D:\\work\\ida-env\\ida91\n    toolCallTimeoutMs: 300000\n  - name: 'off'\n    transport: stdio\n    enabled: false\n    command: y.exe\n  - name: web\n    transport: streamable-http\n    url: https://example.test/mcp\n    headers:\n      Authorization: Bearer T\n"
+  },
+  "patchRows": {
+    "rows": [
+      {
+        "id": "llm",
+        "name": "dsh-llm-newapi",
+        "config": {
+          "baseURL": "https://x.test"
+        }
+      },
+      {
+        "insert": [
+          {
+            "id": "dsh-purge",
+            "name": "dsh-purge"
+          }
+        ]
+      },
+      {
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "config": {
+          "serverName": "ida",
+          "command": "x.exe"
+        }
+      },
+      {
+        "insert": [
+          {
+            "name": "@deepseek-ai/dsh-mcp-client",
+            "config": {
+              "serverName": "web",
+              "url": "https://e.test/mcp"
+            }
+          }
+        ]
+      },
+      {
+        "insert": []
+      },
+      {
+        "name": "@deepseek-ai/dsh-mcp-client",
+        "disabled": true,
+        "config": {
+          "serverName": "off",
+          "command": "y.exe"
+        }
+      }
+    ],
+    "found": [
+      [
+        5,
+        "off"
+      ],
+      [
+        2,
+        "ida"
+      ],
+      [
+        0,
+        "web"
+      ]
+    ],
+    "afterRemove": [
+      {
+        "id": "llm",
+        "name": "dsh-llm-newapi",
+        "config": {
+          "baseURL": "https://x.test"
+        }
+      },
+      {
+        "insert": [
+          {
+            "id": "dsh-purge",
+            "name": "dsh-purge"
+          }
+        ]
+      }
+    ]
+  },
+  "dispatch": {
+    "action": "nope",
+    "expected": {
+      "ok": false,
+      "error": {
+        "code": "unknown-endpoint",
+        "message": "Unknown action nope",
+        "details": {}
+      }
+    }
+  }
+}

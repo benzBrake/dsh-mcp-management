@@ -1,0 +1,5 @@
+# dsh-mcp-management bundle 层：把宿主插件挂进 profile。
+# 浏览器端由同一个包的 package.json `dsh.client` 声明自动发现。
+- insert:
+    - id: mcp-management
+      name: 'dsh-mcp-management'
